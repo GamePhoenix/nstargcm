@@ -4,6 +4,8 @@ import astropy.constants as astropyc
 from matplotlib.animation import FuncAnimation
 from astropy import units as u
 
+#First Push!
+
 class Star:
     def __init__(self, teff : int, mass : float) -> None:
         self.teff = teff
