@@ -1,0 +1,10 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+t = 100
+theta = np.linspace(0,2*np.pi,100)
+x_data = t*np.sin(theta)
+y_data = t*np.cos(theta)
+
+plt.scatter(x_data,y_data)
+plt.show()
