@@ -12,7 +12,7 @@ def simualteSystemPositions(system : System, simTime : float, dt : float) -> dic
     velocities = {body: body.vel.copy() for body in system.bodies}
     for k in range(int(total)):
         frameStart = time.perf_counter()
-        forces = {body : np.zeros(3) for body in system.bodies}
+        forces = {body : np.zeros(3, dtype=float) for body in system.bodies}
         for i, body1 in enumerate(system.bodies):
             for j in range(i+1, len(system.bodies)):
                 body2 = system.bodies[j]
@@ -32,5 +32,5 @@ def gravitationalForce(p1 : Body, p2 : Body) -> np.array:
     G = con.G
     disVec = p2.pos-p1.pos
     disMag = np.linalg.norm(disVec)
-    return G*p1.mass*p2.mass/(disMag**2) * disVec/disMag if disMag != 0 else np.zeros_like(disVec)
+    return G*p1.mass*p2.mass/(disMag**2) * disVec/disMag if disMag != 0 else np.zeros(3, dtype=float)
  

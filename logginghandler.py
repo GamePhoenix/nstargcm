@@ -13,6 +13,7 @@ perf_log_path = os.path.join(log_dir, f"performance_{timestamp}.log")
 
 perf_logger = logging.getLogger("performance")
 
+
 if perf_logger.hasHandlers():
     perf_logger.handlers.clear()
 
