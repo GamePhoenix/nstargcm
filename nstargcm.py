@@ -15,3 +15,4 @@ def calculateStarParameters(star1 : Star, star2 : Star, axis : float) -> dict[fl
 def calculateSystem(system : System, simTime : float, dt : float):
     time = np.linspace(0, simTime, int(simTime/dt))
     positions = gs.simualteSystemPositions(system, simTime, dt)
+    return positions

@@ -25,3 +25,7 @@ class Planet(Body):
 class System:
     def __init__(self, bodies : list[Body]):
         self.bodies = bodies
+    def getPlanets(self) -> list[Planet]:
+        return[body for body in self.bodies if isinstance(body, Planet)]
+    def getStars(self) -> list[Star]:
+        return[body for body in self.bodies if isinstance(body, Star)]
