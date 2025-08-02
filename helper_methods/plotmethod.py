@@ -12,10 +12,10 @@ def update(frame, system: System, points, trails):
         pos = system.positions[body][frame]
         trail = np.array(system.positions[body][:frame+1])
 
-        points[body].set_data(pos[0], pos[1])
-        points[body].set_3d_properties(pos[2])
+        points[body].set_data([pos[0]], [pos[1]])
+        points[body].set_3d_properties([pos[2]])
 
-        trails[body].set_data(trail[:, 0], trail[:, 1])
+        trails[body].set_data([trail[:, 0], trail[:, 1]])
         trails[body].set_3d_properties(trail[:, 2])
     return list(points.values()) + list(trails.values())
 
@@ -41,13 +41,29 @@ def animateSystem(system : System, steps : int):
 
 
 def paramsOverTime(system : System, timeArray):
-    fig, axis = plt.subplots(2,1, figsize=(10,10), sharex=True)
+    fig, axis = plt.subplots(2,2, figsize=(10,10), sharex=True)
     total_flux = np.sum([np.array(flux) for flux in system.fluxes.values()], axis=0)
     for star in system.getStars():
-        axis[0].plot(timeArray, system.distances[star], label=f"Distance to {star.name}")
-        axis[1].plot(timeArray, system.fluxes[star], label=f"Flux recieved from {star.name}")
-    axis[1].plot(timeArray, total_flux, label="Total flux")
-    axis[0].set_title("Distance and Flux over Time")
-    axis[0].grid(True)
-    axis[1].grid(True)
+        axis[0][0].plot(timeArray, system.distances[star], label=f"Distance to {star.name}")
+        axis[1][0].plot(timeArray, system.fluxes[star], label=f"Flux recieved from {star.name}")
+    axis[0][1].plot(timeArray, total_flux, label="Total flux")
+
+    axis[0][0].set_title("Distance over Time")
+    axis[1][0].set_title("Flux over Time")
+    axis[0][1].set_title("Total Flux over Time")
+
+    axis[0][0].set_ylabel("Distance [m]")
+    axis[1][0].set_ylabel("Flux [W/m²]")
+    axis[1][0].set_xlabel("Time [s]")
+    axis[1][1].set_xlabel("Time [s]")
+    axis[0][1].set_ylabel("Flux [W/m²]")
+
+    axis[0][0].legend()
+    axis[1][0].legend() 
+
+    axis[0][0].grid(True)
+    axis[1][0].grid(True)
+    axis[0][1].grid(True)
+
+    plt.savefig("SystemParameters.png")
     plt.show()

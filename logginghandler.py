@@ -9,18 +9,28 @@ os.makedirs(log_dir, exist_ok=True)
 
 
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
 perf_log_path = os.path.join(log_dir, f"performance_{timestamp}.log")
+debug_log_path = os.path.join(log_dir, f"debug_{timestamp}.log")
 
 perf_logger = logging.getLogger("performance")
+debug_logger = logging.getLogger("debug")
 
-
-if perf_logger.hasHandlers():
-    perf_logger.handlers.clear()
+for logger in (perf_logger, debug_logger):
+    if logger.hasHandlers():
+        logger.handlers.clear()
 
 perf_handler = logging.FileHandler(perf_log_path, mode='w')
 perf_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
 perf_logger.setLevel(logging.DEBUG)
 perf_logger.addHandler(perf_handler)
+
+debug_handler = logging.FileHandler(debug_log_path, mode='w')
+debug_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+debug_logger.setLevel(logging.DEBUG)
+debug_logger.addHandler(debug_handler)
 
 
 def get_ram_usage_mb():
@@ -49,3 +59,6 @@ def simulation_end(start_time : float, frameCount : float):
     total_time = time.perf_counter() - start_time
     ram_usage = get_ram_usage_mb()
     perf_logger.info(f"Simulation complete. Total time: {total_time:.2f} seconds| Total frames simulated: {frameCount} | Final RAM: {ram_usage:.1f} MB")
+
+def debugVariable(name : str, var):
+    debug_logger.info(f"{name} : {var}")
