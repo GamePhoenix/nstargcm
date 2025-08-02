@@ -19,8 +19,8 @@ def update(frame, system: System, points, trails):
         trails[body].set_3d_properties(trail[:, 2])
     return list(points.values()) + list(trails.values())
 
-def animateSystem(system : System, steps : int):
-    limit = [-25*con.au, 25*con.au]
+def animateSystem(system : System, steps : int, filename : str):
+    limit = [-3*con.au, 3*con.au]
     fig = plt.figure()
     axis = fig.add_subplot(111,projection="3d")
     axis.set_xlim(limit)
@@ -36,11 +36,11 @@ def animateSystem(system : System, steps : int):
         trails[body] = trail
     axis.legend()
     anim = FuncAnimation(fig, update, frames=int(steps), blit=False, interval=30, fargs=(system,points,trails))
-    anim.save("SystemAnimation.gif", writer="pillow", fps=30)
+    anim.save(f"{filename}_animation.gif", writer="pillow", fps=30)
     plt.show()
 
 
-def paramsOverTime(system : System, timeArray):
+def paramsOverTime(system : System, timeArray, filename : str):
     fig, axis = plt.subplots(2,2, figsize=(10,10), sharex=True)
     total_flux = np.sum([np.array(flux) for flux in system.fluxes.values()], axis=0)
     for star in system.getStars():
@@ -65,5 +65,5 @@ def paramsOverTime(system : System, timeArray):
     axis[1][0].grid(True)
     axis[0][1].grid(True)
 
-    plt.savefig("SystemParameters.png")
+    plt.savefig(f"{filename}_parameters.png")
     plt.show()

@@ -5,6 +5,7 @@ au = 1.496e11
 
 rEarth = 6.378e6
 rSun = 696.34e6
+rJup = 7.1492e7
 
 mSun = 1.989e30
 mJup = 1.898e27

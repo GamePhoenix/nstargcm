@@ -3,6 +3,7 @@ from classes import Body, System
 import constants as con
 import logginghandler as log
 import time
+import keplersolver as ks
 
 def simualteSystemPositions(system : System, simTime : float, dt : float) -> dict[Body, list[np.array]]:
     total = simTime/dt
@@ -26,7 +27,29 @@ def simualteSystemPositions(system : System, simTime : float, dt : float) -> dic
         log.performance(k, total, frameStart)
     log.simulation_end(startTime, total)
     return positions
-    
+
+def initiatingParams(systemComponents : list[Body]):
+    for systemComponent in systemComponents:
+        trueAnomaly = ks.solveTrueAnomaly(systemComponent.eccentricity, 0)
+        distance = systemComponent.axis * (1-systemComponent.eccentricity**2) / 1+systemComponent.eccentricity * np.cos(trueAnomaly)
+        rVec = np.array([0, distance, 0])
+        velVec = np.array([0, np.sqrt(con.G*systemComponent.mass*(1/systemComponent.axis)*(1 + systemComponent.eccentricity / 1 - systemComponent.eccentricity)), 0])
+        rVecPrime = completeRotation(rVec, systemComponent.longitudeAsc, systemComponent.inclination, systemComponent.periapsisArg)
+        velVecPrime = completeRotation(velVec, systemComponent.longitudeAsc, systemComponent.inclination, systemComponent.periapsisArg)
+        return [rVecPrime, velVecPrime]
+        
+def completeRotation(vector,longitudeAsc, inclination, periapsisArg):
+    return vector @ rotationZ(longitudeAsc) @ rotationX(inclination) @ rotationZ(periapsisArg)
+
+def rotationX(angle):
+    return np.array([1, 0, 0],
+                    [0, np.cos(angle), -np.sin(angle)],
+                    [0, np.sin(angle), np.cos(angle)])
+
+def rotationZ(angle):
+    return np.array([np.cos(angle), -np.sin(angle), 0],
+                    [np.sin(angle), np.cos(angle), 0],
+                    [0, 0, 1])
 
 def gravitationalForce(p1 : Body, p2 : Body) -> np.array:
     G = con.G
