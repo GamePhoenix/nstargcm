@@ -3,7 +3,9 @@ import psutil
 import time
 import os
 import datetime
+from classes import SystemComponent
 
+ENABLE_LOGGING = True
 log_dir = "logs"
 os.makedirs(log_dir, exist_ok=True)
 
@@ -62,3 +64,6 @@ def simulation_end(start_time : float, frameCount : float):
 
 def debugVariable(name : str, var):
     debug_logger.info(f"{name} : {var}")
+def debugPosVel(sc : SystemComponent):
+    debug_logger.info(f"The current parameters of {sc.compA.name} are: position: {sc.compA.pos}, and velocity : {sc.compA.vel}")
+    debug_logger.info(f"The current parameters of {sc.compB.name} are: position: {sc.compB.pos}, and velocity : {sc.compB.vel}")

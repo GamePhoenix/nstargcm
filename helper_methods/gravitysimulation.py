@@ -3,8 +3,10 @@ from classes import Body, System
 import constants as con
 import logginghandler as log
 import time
-import keplersolver as ks
+import helper_methods.custommath as ks
+from scipy.integrate import solve_ivp
 
+@DeprecationWarning
 def simualteSystemPositions(system : System, simTime : float, dt : float) -> dict[Body, list[np.array]]:
     total = simTime/dt
     startTime = time.perf_counter()
@@ -28,32 +30,39 @@ def simualteSystemPositions(system : System, simTime : float, dt : float) -> dic
     log.simulation_end(startTime, total)
     return positions
 
-def initiatingParams(systemComponents : list[Body]):
-    for systemComponent in systemComponents:
-        trueAnomaly = ks.solveTrueAnomaly(systemComponent.eccentricity, 0)
-        distance = systemComponent.axis * (1-systemComponent.eccentricity**2) / 1+systemComponent.eccentricity * np.cos(trueAnomaly)
-        rVec = np.array([0, distance, 0])
-        velVec = np.array([0, np.sqrt(con.G*systemComponent.mass*(1/systemComponent.axis)*(1 + systemComponent.eccentricity / 1 - systemComponent.eccentricity)), 0])
-        rVecPrime = completeRotation(rVec, systemComponent.longitudeAsc, systemComponent.inclination, systemComponent.periapsisArg)
-        velVecPrime = completeRotation(velVec, systemComponent.longitudeAsc, systemComponent.inclination, systemComponent.periapsisArg)
-        return [rVecPrime, velVecPrime]
-        
-def completeRotation(vector,longitudeAsc, inclination, periapsisArg):
-    return vector @ rotationZ(longitudeAsc) @ rotationX(inclination) @ rotationZ(periapsisArg)
-
-def rotationX(angle):
-    return np.array([1, 0, 0],
-                    [0, np.cos(angle), -np.sin(angle)],
-                    [0, np.sin(angle), np.cos(angle)])
-
-def rotationZ(angle):
-    return np.array([np.cos(angle), -np.sin(angle), 0],
-                    [np.sin(angle), np.cos(angle), 0],
-                    [0, 0, 1])
-
+@DeprecationWarning
 def gravitationalForce(p1 : Body, p2 : Body) -> np.array:
     G = con.G
     disVec = p2.pos-p1.pos
     disMag = np.linalg.norm(disVec)
     return G*p1.mass*p2.mass/(disMag**2) * disVec/disMag if disMag != 0 else np.zeros(3, dtype=float)
+
+def getDerivatives(t : float, y : np.ndarray, system : System):
+    pos = y[:3*system.componentNumber].reshape((system.componentNumber,3))
+    vel = y[3*system.componentNumber:].reshape((system.componentNumber,3))
+    acceleration = np.zeros((system.componentNumber,3), dtype=float)
+
+    for i, body_i in enumerate(system.components):
+        for j, body_j in enumerate(system.components):
+            if i == j:
+                continue
+            distanceVec = pos[j] - pos[i]
+            distanceMag = np.sqrt(np.sum(distanceVec**2)) + 1e-10
+            acceleration[i] += system.components[j].mass * distanceVec/distanceMag**3
+    
+    dydt = np.concatenate((vel, acceleration * con.G), axis=0)
+    return dydt.flatten()
+
+def simulateSystem(system : System, simTime : float, timeArray):
+    tol = 1e-9
+    initialComps = system.combineInitialParams()
+    return solve_ivp(fun = lambda t, y: getDerivatives(t, y, system),
+                    t_span=(0,simTime),
+                    y0=initialComps,
+                    t_eval=timeArray,
+                    rtol=tol, 
+                    atol=tol
+                    )
+
+
  
