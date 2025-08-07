@@ -1,6 +1,6 @@
 import numpy as np
 import constants as con
-import helper_methods.custommath as cm
+import helpermethod.custommath as cm
 
 def unpackBody(body):
     if isinstance(body, SystemComponent):
@@ -32,12 +32,13 @@ class Star(Body):
 
 class Planet(Body):
     def __init__(self, name : str, albedo : float, mass : float, radius : float, 
-                 heatCapacity : float, rotPeriod : float) -> None:
+                 heatCapacity : float, rotPeriod : float, axialTilt : float) -> None:
         super().__init__(name, mass, np.zeros_like(3, dtype=float), np.zeros_like(3, dtype=float))
         self.radius = radius
         self.albedo = albedo
         self.heatCapacity = heatCapacity
         self.rotPeriod = rotPeriod
+        self.axialTilt = axialTilt
 
 class SystemComponent(Body):
     def __init__(self, compA : Body, compB : Body,  name : str, axis : float, 
@@ -104,9 +105,9 @@ class System(SystemComponent):
         self.fluxes = None
         self.components = self.getBodies()
         self.componentNumber = len(self.components)
-        self.inclination = cm.convertToRadians(inclination)
-        self.longitudeAsc = cm.convertToRadians(longitudeAsc)
-        self.periapsisArg = cm.convertToRadians(periapsisArg)
+        self.inclination = np.radians(inclination)
+        self.longitudeAsc = np.radians(longitudeAsc)
+        self.periapsisArg = np.radians(periapsisArg)
         self.eccentricity = eccentricity
         self.axis = axis
         self.mass = self.compB.mass+self.compA.mass
@@ -140,3 +141,7 @@ class System(SystemComponent):
         for body in self.components:
             initialParams.extend(body.vel)
         return np.array(initialParams, dtype=float)
+    
+class Simulation:
+    def __init__(self):
+        pass

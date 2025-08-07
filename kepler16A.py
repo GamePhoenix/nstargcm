@@ -10,4 +10,4 @@ if __name__ == "__main__":
                                       inclination=90.3, longitudeAsc=0, periapsisArg=263.67)
     kepler16System = gcm.System(compA=keplerStars, compB=kepler16b, axis=0.7048*con.au, eccentricity=0.0069,
                                 inclination=90.032,longitudeAsc=0,periapsisArg=318)
-    gcm.calculateSystem(kepler16System, 10*con.year, 10*con.day, True, "kepler-16")
+    gcm.calculateSystem(kepler16System, 1e5*con.year, 0.9*con.day, True, "kepler-16-1dt-test", False, 42)
